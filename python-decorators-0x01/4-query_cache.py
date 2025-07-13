@@ -2,9 +2,10 @@ import time
 import sqlite3 
 import functools
 
+# Cache dictionary to store query results
 query_cache = {}
 
-# Decorator to handle DB connection (copy from previous task)
+# Decorator to handle DB connection setup and teardown
 def with_db_connection(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
@@ -19,12 +20,16 @@ def with_db_connection(func):
 def cache_query(func):
     @functools.wraps(func)
     def wrapper(conn, *args, **kwargs):
+        # Get query string from keyword or positional argument
         query = kwargs.get('query') or (args[0] if args else None)
+        if not query:
+            return func(conn, *args, **kwargs)
+
         if query in query_cache:
-            print("Using cached result for query.")
+            print("Using cached result.")
             return query_cache[query]
         else:
-            print("Executing and caching result.")
+            print("Executing query and caching result.")
             result = func(conn, *args, **kwargs)
             query_cache[query] = result
             return result

@@ -8,8 +8,6 @@ def log_queries(func):
         query = kwargs.get('query') or (args[0] if args else None)
         if query:
             print(f"Executing SQL query: {query}")
-        else:
-            print("No SQL query found to log.")
         return func(*args, **kwargs)
     return wrapper
 
