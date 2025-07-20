@@ -1,5 +1,4 @@
-#!/usr/bin/env python3
-import unittest
+mport unittest
 from parameterized import parameterized
 from utils import access_nested_map
 
@@ -43,15 +42,30 @@ class TestGetJson(unittest.TestCase):
 
             mock_get.assert_called_once_with(test_url)
             self.assertEqual(result, test_payload)
-ddef memoize(method):
-    """Decorator to cache the result of an instance method with no arguments."""
-    attr_name = f"_memoized_{method.__name__}"
+import unittest
+from unittest.mock import patch
+from utils import memoize  # Make sure utils.memoize is importable
 
-    @property
-    def memoized(self):
-        if not hasattr(self, attr_name):
-            setattr(self, attr_name, method(self))
-        return getattr(self, attr_name)
+class TestMemoize(unittest.TestCase):
+    def test_memoize(self):
+        class TestClass:
+            def a_method(self):
+                return 42
 
-    return memoized
+            @memoize
+            def a_property(self):
+                return self.a_method()
 
+        test_obj = TestClass()
+
+        with patch.object(test_obj, 'a_method', return_value=42) as mocked_method:
+            # Call a_property twice
+            result1 = test_obj.a_property
+            result2 = test_obj.a_property
+
+            # Both calls should return 42
+            self.assertEqual(result1, 42)
+            self.assertEqual(result2, 42)
+
+            # a_method should be called only once due to memoization
+            mocked_method.assert_called_once()
