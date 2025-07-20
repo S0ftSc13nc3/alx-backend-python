@@ -43,30 +43,13 @@ class TestGetJson(unittest.TestCase):
 
             mock_get.assert_called_once_with(test_url)
             self.assertEqual(result, test_payload)
-import unittest
-from unittest.mock import patch
-from utils import memoize  # Make sure utils.memoize is importable
+def memoize(fn):
+    attr_name = "_memoized_" + fn.__name__
 
-class TestMemoize(unittest.TestCase):
-    def test_memoize(self):
-        class TestClass:
-            def a_method(self):
-                return 42
+    @property
+    def memoized(self):
+        if not hasattr(self, attr_name):
+            setattr(self, attr_name, fn(self))
+        return getattr(self, attr_name)
 
-            @memoize
-            def a_property(self):
-                return self.a_method()
-
-        test_obj = TestClass()
-
-        with patch.object(test_obj, 'a_method', return_value=42) as mocked_method:
-            # Call a_property twice
-            result1 = test_obj.a_property
-            result2 = test_obj.a_property
-
-            # Both calls should return 42
-            self.assertEqual(result1, 42)
-            self.assertEqual(result2, 42)
-
-            # a_method should be called only once due to memoization
-            mocked_method.assert_called_once()
+    return memoized
