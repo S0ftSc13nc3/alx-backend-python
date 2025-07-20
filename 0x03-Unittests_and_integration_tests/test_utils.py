@@ -43,13 +43,15 @@ class TestGetJson(unittest.TestCase):
 
             mock_get.assert_called_once_with(test_url)
             self.assertEqual(result, test_payload)
-def memoize(fn):
-    attr_name = "_memoized_" + fn.__name__
+ddef memoize(method):
+    """Decorator to cache the result of an instance method with no arguments."""
+    attr_name = f"_memoized_{method.__name__}"
 
     @property
     def memoized(self):
         if not hasattr(self, attr_name):
-            setattr(self, attr_name, fn(self))
+            setattr(self, attr_name, method(self))
         return getattr(self, attr_name)
 
     return memoized
+
